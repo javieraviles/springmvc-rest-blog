@@ -1,0 +1,11 @@
+<html>
+<body>
+	<h1>BLOG</h1>
+	<ul>
+	{{#posts}}
+		<li><a href="/showPostDetail/{{id}}">{{title}}</a></li>
+	{{/posts}}
+	</ul>
+	<a href="/createPost">Create new Post</a>
+</body>
+</html>

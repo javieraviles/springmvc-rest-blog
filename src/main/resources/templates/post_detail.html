@@ -1,0 +1,24 @@
+<html>
+<body>
+	{{#post}}
+		<h1>{{title}}</h1>
+		<p>{{content}}<p>
+		
+	{{/post}}
+	<ul>
+	{{#comments}}
+		<li>
+			<p>{{name}} | {{content}} <a href="/deleteComment/{{postId}}/{{id}}"><button>Delete</button></a></p>
+		</li>
+	{{/comments}}
+	</ul>
+	
+	
+	<form action="/createComment/{{postId}}" method="post">
+		<h3>New Comment</h3>
+		Name: <input type='text' name='name' value='{{userName}}'/> <br> Content:
+		<textarea rows="3" cols="50" name="content"></textarea>
+		<br> <input type='submit' value='Create' />
+	</form>
+</body>
+</html>
