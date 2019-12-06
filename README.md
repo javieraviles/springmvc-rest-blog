@@ -23,10 +23,20 @@ University master exercise
  - Response (200 OK):
     ```json 
         {
-            "id": 1,
+            "id": 2,
             "title": "titlePost1",
             "content": "contentPost1",
-            "comments": {}
+            "comments": [
+                {
+                    "id": 3,
+                    "author": {
+                        "id": 1,
+                        "name": "authorName1",
+                        "age": 30
+                    },
+                    "content": "contentComment1Post1"
+                }
+            ]
         }
     ```
 ## Create Post
@@ -85,22 +95,38 @@ University master exercise
  - Body:
     ```json 
         {
-            "name":"nameComment1Post1",
-            "content":"contentComment1Post1",
-            "comments": {}
+            "author": {
+                "id":1
+            },
+            "content":"contentComment1Post1"
         }
     ```
  - Response (201 CREATED)
     ```json 
         {
-            "id": 1,
-            "title": "modifiedTitlePost1",
-            "content": "modifiedContentPost1",
-            "comments": {
-                "id": 1,
-                "name":"nameComment1Post1",
-                "content":"contentComment1Post1"
-            }
+            "id": 5,
+            "title": "titlePost1",
+            "content": "contentPost1",
+            "comments": [
+                {
+                    "id": 8,
+                    "author": {
+                        "id": 1,
+                        "name": "authorName1",
+                        "age": 30
+                    },
+                    "content": "contentComment1Post1"
+                },
+                {
+                    "id": 6,
+                    "author": {
+                        "id": 1,
+                        "name": "authorName1",
+                        "age": 30
+                    },
+                    "content": "contentComment1Post1"
+                }
+            ]
         }
     ```
 ## Delete Comment
@@ -113,5 +139,49 @@ University master exercise
             "title": "modifiedTitlePost1",
             "content": "modifiedContentPost1",
             "comments": {}
+        }
+    ```
+
+## Create Author
+ - Method: POST
+ - URI: /api/authors/
+ - Body:
+    ```json 
+        {
+            "name":"authorName1",
+            "age":30
+        }
+    ```
+ - Response (201 CREATED)
+    ```json 
+        {
+            "id": 1,
+            "name": "authorName1",
+            "age": 30
+        }
+    ```
+
+## Get Author comments
+ - Method: GET
+ - URI: /api/authors/{authorId}/comments
+ - Response (200 OK):
+    ```json 
+        {
+            "comments": [
+                {
+                    "id": 3,
+                    "content": "contentComment1Post1",
+                    "post": {
+                        "id": 2
+                    }
+                },
+                {
+                    "id": 4,
+                    "content": "contentComment1Post1",
+                    "post": {
+                        "id": 2
+                    }
+                }
+            ]
         }
     ```

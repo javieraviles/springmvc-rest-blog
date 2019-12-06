@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c80238c4-5687-445b-8a2e-637979d1b69b",
+		"_postman_id": "3f9059a6-6022-4f4a-acc8-a94dff2f1c24",
 		"name": "BLOG_API_TESTS",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -280,6 +280,61 @@
 			"response": []
 		},
 		{
+			"name": "Create Author",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "23e94164-335d-4370-8baa-b9f2c811cbcd",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"// save post id in global variable to be reused in future requests",
+							"var jsonData = pm.response.json();",
+							"pm.globals.set(\"authorId\", jsonData.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\":\"authorName1\",\n\t\"age\":30\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/authors/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"authors",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Create Comment In Post",
 			"event": [
 				{
@@ -311,7 +366,60 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\":\"nameComment1Post1\",\n\t\"content\":\"contentComment1Post1\"\n}",
+					"raw": "{\n\t\"author\": {\n\t\t\"id\": \"{{authorId}}\"\n\t},\n\t\"content\":\"contentComment1Post1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/posts/{{postId}}/comments/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"posts",
+						"{{postId}}",
+						"comments",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cannot create Comment without Author Id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2af080e6-6d94-44a6-b176-03200898bc4c",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"content\":\"contentComment1Post1\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -473,6 +581,78 @@
 						"api",
 						"posts",
 						"{{postId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Author comments",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dfb576fb-9e05-4505-9b8b-0cf23f65652a",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/authors/{{authorId}}/comments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"authors",
+						"{{authorId}}",
+						"comments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get unexisting Author returns 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dfb576fb-9e05-4505-9b8b-0cf23f65652a",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/authors/0/comments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"authors",
+						"0",
+						"comments"
 					]
 				}
 			},

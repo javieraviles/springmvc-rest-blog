@@ -1,82 +1,98 @@
 package es.codeurjc.blog.services;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import es.codeurjc.blog.models.Comment;
-import es.codeurjc.blog.models.Post;
+import es.codeurjc.blog.entities.Author;
+import es.codeurjc.blog.entities.Comment;
+import es.codeurjc.blog.entities.Post;
+import es.codeurjc.blog.repositories.AuthorRepository;
+import es.codeurjc.blog.repositories.CommentRepository;
+import es.codeurjc.blog.repositories.PostRepository;
 
 @Service
 public class PostService {
 
-	private Map<Long, Post> posts = new ConcurrentHashMap<>();
-	private AtomicLong lastId = new AtomicLong();
+	@Autowired
+	PostRepository postRepository;
+
+	@Autowired
+	CommentRepository commentRepository;
+
+	@Autowired
+	AuthorRepository authorRepository;
 
 	public Collection<Post> getPosts() {
-		return posts.values();
+		return postRepository.findAll();
 	}
 
-	public Post getPost(final Long postId) {
-		return posts.get(postId);
+	public Optional<Post> getPost(final Long postId) {
+		final Optional<Post> post = postRepository.findById(postId);
+		if (post.isPresent()) {
+			post.get().getComments().size();
+		}
+		return post;
 	}
 
 	public Post createPost(final Post post) {
-		final Long newPostId = generateNextPostId();
-		post.setId(newPostId);
-		posts.put(newPostId, post);
-		return post;
+		return postRepository.save(post);
 	}
 
 	public Post updatePost(final Long postId, final Post post) {
 		post.setId(postId);
-		if (posts.containsKey(postId)) {
-			posts.put(postId, post);
-			return post;
+		if (postRepository.findById(postId).isPresent()) {
+			return postRepository.save(post);
 		} else {
 			return null;
 		}
 	}
 
 	public Post deletePost(final Long postId) {
-		if (posts.containsKey(postId)) {
-			final Post postToBeRemoved = posts.get(postId);
-			posts.remove(postId);
-			return postToBeRemoved;
+		final Optional<Post> postToBeRemoved = postRepository.findById(postId);
+		if (postToBeRemoved.isPresent()) {
+			postToBeRemoved.get().getComments().size();
+			postRepository.deleteById(postId);
+			return postToBeRemoved.get();
 		} else {
 			return null;
 		}
 	}
 
 	public Post addCommentToPost(final Comment comment, final Long postId) {
-		if (posts.containsKey(postId)) {
-			final Post post = posts.get(postId);
-			final Map<Long, Comment> postComments = post.getComments();
-			final Long newCommentId = post.generateNextCommentId();
-			comment.setId(newCommentId);
-			postComments.put(newCommentId, comment);
-			return post;
+		final Optional<Post> post = postRepository.findById(postId);
+		if (post.isPresent()) {
+			comment.setPost(post.get());
+			post.get().getComments().add(comment);
+			postRepository.save(post.get());
+			return post.get();
 		} else {
 			return null;
 		}
 	}
 
-	public Post removeCommentFromPost(final Long postId, final Long commentId) {
-		if (posts.containsKey(postId)) {
-			final Post post = posts.get(postId);
-			final Map<Long, Comment> postComments = post.getComments();
-			postComments.remove(commentId);
-			return post;
+	public Comment removeCommentFromPost(final Long postId, final Long commentId) {
+		final Optional<Comment> comment = commentRepository.findByIdAndPostId(commentId, postId);
+		if (comment.isPresent()) {
+			commentRepository.deleteById(commentId);
+			return comment.get();
 		} else {
 			return null;
 		}
 	}
 
-	private Long generateNextPostId() {
-		return lastId.incrementAndGet();
+	public Author createAuthor(final Author author) {
+		return authorRepository.save(author);
+	}
+	
+	public Optional<Author> getAuthor(final Long authorId) {
+		final Optional<Author> author = authorRepository.findById(authorId);
+		if (author.isPresent()) {
+			author.get().getComments().size();
+		}
+		return author;
 	}
 
 }
